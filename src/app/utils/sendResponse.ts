@@ -5,6 +5,7 @@ type TMeta = {
 	limit: number;
 	total: number;
 	totalPages: number;
+	unreadCount?: number; // only used by the notification list
 };
 
 type TResponseData<T> = {

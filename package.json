@@ -14,10 +14,13 @@
         "prisma:deploy": "prisma migrate deploy",
         "prisma:studio": "prisma studio",
         "seed": "tsx src/app/scripts/seedAdmin.ts",
-        "format:check": "npx @biomejs/biome format ./src",
-        "format:fix": "npx @biomejs/biome format --write ./src",
-        "lint:check": "npx @biomejs/biome lint ./src",
-        "lint:fix": "npx @biomejs/biome lint --write ./src"
+        "typecheck": "tsc --noEmit -p .",
+        "test:e2e": "tsx tests/e2e.ts",
+        "test:payment": "tsx tests/payment-sandbox.ts",
+        "format:check": "npx @biomejs/biome format ./src ./tests",
+        "format:fix": "npx @biomejs/biome format --write ./src ./tests",
+        "lint:check": "npx @biomejs/biome lint ./src ./tests",
+        "lint:fix": "npx @biomejs/biome lint --write ./src ./tests"
     },
     "keywords": [],
     "author": "",

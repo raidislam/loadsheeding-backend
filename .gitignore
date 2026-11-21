@@ -13,3 +13,6 @@ package-lock.json
 pnpm-workspace.yaml
 .vscode
 .vercel
+
+# local state of the manual payment test
+tests/.payment-state.json

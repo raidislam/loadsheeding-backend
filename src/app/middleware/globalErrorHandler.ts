@@ -46,12 +46,24 @@ export const globalErrorHandler = (
 		} else if (err.code === "P2025") {
 			statusCode = httpStatus.NOT_FOUND;
 			message = "Record not found";
+		} else if (err.code === "P2034") {
+			// Two requests changed the same data at the same time; this one was rolled back
+			statusCode = httpStatus.CONFLICT;
+			message = "Another request changed this data at the same time. Nothing was saved. Please try again.";
+		} else if (err.code === "P2028") {
+			// Transaction took too long and was rolled back (nothing was saved)
+			statusCode = httpStatus.SERVICE_UNAVAILABLE;
+			message = "The request took too long and was cancelled. Nothing was saved. Please try again.";
 		} else {
 			message = "Database request error";
 		}
 	} else if (err instanceof Prisma.PrismaClientValidationError) {
 		statusCode = httpStatus.BAD_REQUEST;
 		message = "Invalid data sent to the database";
+	} else if (err?.message === "TransactionWriteConflict" || err?.cause?.kind === "TransactionWriteConflict") {
+		// Same as P2034, but this is how the pg driver adapter reports it
+		statusCode = httpStatus.CONFLICT;
+		message = "Another request changed this data at the same time. Nothing was saved. Please try again.";
 	} else if (err?.type === "entity.parse.failed") {
 		// Invalid JSON in the request body (thrown by express.json())
 		statusCode = httpStatus.BAD_REQUEST;
