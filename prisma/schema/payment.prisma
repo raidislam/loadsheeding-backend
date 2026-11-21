@@ -1,0 +1,54 @@
+// Monthly electricity bill created by admin for a customer.
+model Bill {
+  id            String     @id @default(uuid())
+  billMonth     String // format "YYYY-MM", e.g. "2026-11"
+  unitsConsumed Int
+  amount        Decimal    @db.Decimal(10, 2)
+  dueDate       DateTime
+  status        BillStatus @default(UNPAID)
+  paidAt        DateTime?
+
+  customerId String
+  customer   User   @relation(fields: [customerId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // A bill can have several attempts (e.g. one FAILED, then one SUCCESS)
+  payments Payment[]
+
+  // One bill per customer per month
+  @@unique([customerId, billMonth])
+  @@index([status])
+  @@map("bills")
+}
+
+// One SSLCommerz payment attempt for a bill.
+model Payment {
+  id            String        @id @default(uuid())
+  transactionId String        @unique // our tran_id sent to SSLCommerz
+  amount        Decimal       @db.Decimal(10, 2)
+  currency      String        @default("BDT")
+  status        PaymentStatus @default(PENDING)
+
+  // Filled after SSLCommerz validation
+  valId             String?
+  bankTransactionId String?
+  cardType          String?
+  gatewayResponse   Json?
+  paidAt            DateTime?
+
+  billId String
+  bill   Bill   @relation(fields: [billId], references: [id], onDelete: Restrict)
+
+  customerId String
+  customer   User   @relation(fields: [customerId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([billId])
+  @@index([customerId])
+  @@index([status])
+  @@map("payments")
+}

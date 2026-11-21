@@ -1,0 +1,80 @@
+// Electricity network hierarchy:
+// DistributionZone -> Substation -> Feeder -> Area
+//
+// Parents use onDelete: Restrict, so a parent row can never be hard-deleted
+// while children exist. The API only soft deletes (sets deletedAt).
+
+model DistributionZone {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  code        String  @unique // e.g. "DHK-N"
+  description String?
+
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  substations Substation[]
+
+  @@map("distribution_zones")
+}
+
+model Substation {
+  id         String  @id @default(uuid())
+  name       String
+  code       String  @unique
+  capacityMW Float?
+  address    String?
+
+  zoneId String
+  zone   DistributionZone @relation(fields: [zoneId], references: [id], onDelete: Restrict)
+
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  feeders Feeder[]
+
+  @@index([zoneId])
+  @@map("substations")
+}
+
+model Feeder {
+  id        String @id @default(uuid())
+  name      String
+  code      String @unique
+  voltageKV Float?
+
+  substationId String
+  substation   Substation @relation(fields: [substationId], references: [id], onDelete: Restrict)
+
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  areas Area[]
+
+  @@index([substationId])
+  @@map("feeders")
+}
+
+model Area {
+  id   String @id @default(uuid())
+  name String
+  code String @unique
+
+  feederId String
+  feeder   Feeder @relation(fields: [feederId], references: [id], onDelete: Restrict)
+
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  customers     User[]
+  outages       Outage[]
+  outageReports OutageReport[]
+
+  @@index([feederId])
+  @@index([name])
+  @@map("areas")
+}

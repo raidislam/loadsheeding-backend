@@ -1,0 +1,20 @@
+// Record of important actions, e.g.
+// action: "OUTAGE_CREATED", entityType: "Outage", entityId: "<outage id>"
+model AuditLog {
+  id         String  @id @default(uuid())
+  action     String
+  entityType String
+  entityId   String?
+  details    Json? // extra info, e.g. { "oldRole": "CUSTOMER", "newRole": "TECHNICIAN" }
+
+  // Who did it (null = system, e.g. SSLCommerz IPN)
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}

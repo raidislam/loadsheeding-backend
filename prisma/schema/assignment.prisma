@@ -1,0 +1,48 @@
+// Admin assigns one technician to one outage report.
+model TechnicianAssignment {
+  id     String           @id @default(uuid())
+  status AssignmentStatus @default(ASSIGNED)
+  note   String? // instructions from admin
+
+  assignedAt  DateTime  @default(now())
+  acceptedAt  DateTime?
+  startedAt   DateTime?
+  completedAt DateTime?
+
+  // @unique -> one report can have only one assignment
+  reportId String       @unique
+  report   OutageReport @relation(fields: [reportId], references: [id], onDelete: Restrict)
+
+  technicianId String
+  technician   User   @relation("TechnicianJobs", fields: [technicianId], references: [id], onDelete: Restrict)
+
+  assignedById String
+  assignedBy   User   @relation("AssignedByAdmin", fields: [assignedById], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  repairRecords RepairRecord[]
+
+  @@index([technicianId])
+  @@index([status])
+  @@map("technician_assignments")
+}
+
+// Repair report submitted by the technician when the work is done.
+// The technician is known through the assignment, so it is not stored again.
+model RepairRecord {
+  id              String   @id @default(uuid())
+  workDescription String
+  partsUsed       String?
+  restoredAt      DateTime
+
+  assignmentId String
+  assignment   TechnicianAssignment @relation(fields: [assignmentId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([assignmentId])
+  @@map("repair_records")
+}

@@ -1,0 +1,66 @@
+// An outage always belongs to one Area.
+// Zone / Substation / Feeder are read through: area -> feeder -> substation -> zone
+// (not stored again here, so the data can never become inconsistent).
+model Outage {
+  id          String       @id @default(uuid())
+  title       String
+  type        OutageType   @default(SCHEDULED)
+  status      OutageStatus @default(SCHEDULED)
+  reason      String
+  description String?
+
+  startTime           DateTime
+  expectedRestoreTime DateTime
+  actualRestoreTime   DateTime?
+
+  areaId String
+  area   Area   @relation(fields: [areaId], references: [id], onDelete: Restrict)
+
+  createdById String
+  createdBy   User   @relation(fields: [createdById], references: [id], onDelete: Restrict)
+
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Customer reports that admin linked to this outage
+  reports OutageReport[]
+
+  @@index([areaId])
+  @@index([status])
+  @@index([type])
+  @@index([startTime])
+  @@map("outages")
+}
+
+// Unexpected outage reported by a customer.
+model OutageReport {
+  id          String       @id @default(uuid())
+  title       String
+  description String
+  address     String? // exact location, e.g. "House 12, Road 5"
+  status      ReportStatus @default(PENDING)
+  adminNote   String? // review note / rejection reason
+  restoredAt  DateTime? // set when the repair is completed
+
+  customerId String
+  customer   User   @relation(fields: [customerId], references: [id], onDelete: Restrict)
+
+  areaId String
+  area   Area   @relation(fields: [areaId], references: [id], onDelete: Restrict)
+
+  // Optional: admin can link the report to an outage record
+  outageId String?
+  outage   Outage? @relation(fields: [outageId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // One report has at most one technician assignment
+  assignment TechnicianAssignment?
+
+  @@index([customerId])
+  @@index([areaId])
+  @@index([status])
+  @@map("outage_reports")
+}

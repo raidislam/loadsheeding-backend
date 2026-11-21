@@ -1,0 +1,39 @@
+// One table for all three roles (ADMIN, CUSTOMER, TECHNICIAN).
+model User {
+  id       String     @id @default(uuid())
+  name     String
+  email    String     @unique
+  password String // bcrypt hash, never returned in API responses
+  phone    String?
+  address  String?
+  role     Role       @default(CUSTOMER)
+  status   UserStatus @default(ACTIVE)
+
+  // Customer only: electricity meter number
+  meterNumber String? @unique
+
+  // Hash of the latest refresh token. Cleared on logout.
+  refreshTokenHash String?
+
+  // Customer's home area (used to send scheduled outage notifications)
+  areaId String?
+  area   Area?   @relation(fields: [areaId], references: [id], onDelete: SetNull)
+
+  deletedAt DateTime? // soft delete
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relations
+  outagesCreated      Outage[]
+  outageReports       OutageReport[]
+  technicianJobs      TechnicianAssignment[] @relation("TechnicianJobs")
+  assignmentsAssigned TechnicianAssignment[] @relation("AssignedByAdmin")
+  notifications       Notification[]
+  bills               Bill[]
+  payments            Payment[]
+  auditLogs           AuditLog[]
+
+  @@index([role])
+  @@index([areaId])
+  @@map("users")
+}

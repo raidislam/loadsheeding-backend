@@ -1,0 +1,11 @@
+// Prisma schema is split into multiple files inside prisma/schema.
+// Add one .prisma file per model.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}

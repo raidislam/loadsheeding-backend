@@ -1,0 +1,67 @@
+// ---------- Users ----------
+enum Role {
+  ADMIN
+  CUSTOMER
+  TECHNICIAN
+}
+
+enum UserStatus {
+  ACTIVE
+  BLOCKED
+}
+
+// ---------- Outages ----------
+enum OutageType {
+  SCHEDULED // planned by admin (load shedding / maintenance)
+  UNEXPECTED // sudden fault
+}
+
+enum OutageStatus {
+  SCHEDULED // announced, not started yet
+  ONGOING // power is currently off
+  RESOLVED // power restored
+  CANCELLED // planned outage was cancelled
+}
+
+// ---------- Customer outage reports ----------
+enum ReportStatus {
+  PENDING // just submitted by customer
+  UNDER_REVIEW // admin is checking it
+  ASSIGNED // technician assigned
+  IN_PROGRESS // technician is repairing
+  RESOLVED // power restored
+  REJECTED // admin rejected (invalid / duplicate report)
+}
+
+// ---------- Technician jobs ----------
+// Allowed flow: ASSIGNED -> ACCEPTED -> IN_PROGRESS -> COMPLETED
+enum AssignmentStatus {
+  ASSIGNED
+  ACCEPTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+// ---------- Notifications ----------
+enum NotificationType {
+  SCHEDULED_OUTAGE
+  OUTAGE_UPDATE
+  REPORT_UPDATE
+  JOB_ASSIGNED
+  POWER_RESTORED
+  PAYMENT
+  GENERAL
+}
+
+// ---------- Bills & payments ----------
+enum BillStatus {
+  UNPAID
+  PAID
+}
+
+enum PaymentStatus {
+  PENDING // SSLCommerz session created, waiting for customer
+  SUCCESS // verified with SSLCommerz validation API
+  FAILED
+  CANCELLED
+}
