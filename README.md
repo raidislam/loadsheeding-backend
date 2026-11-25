@@ -476,6 +476,14 @@ npm run test:payment -- verify       # checks SUCCESS, PAID, notification, audit
 npm run test:payment -- cleanup      # only removes the test data (if you didn't pay)
 ```
 
+### Postman
+
+The `postman/` folder has a ready-to-use collection with all 64 endpoints: descriptions, saved success and error examples recorded from the real server, and scripts that save tokens and ids automatically.
+
+1. Import `postman/Load-Shedding-API.postman_collection.json` and `postman/Load-Shedding-Local.postman_environment.json`.
+2. Select the **Load Shedding - Local** environment and set `ADMIN_EMAIL` and `ADMIN_PASSWORD`.
+3. Run `npm run dev`, then follow the run order in the collection description (Login Admin, then create the network, register the customer, create the technician, and so on).
+
 ## 15. Deployment (Vercel)
 
 1. Push the code to GitHub. `.env` is **not** pushed.
